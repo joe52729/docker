@@ -1,0 +1,40 @@
+version: '3.1'
+services:
+  db:
+    image: mariadb:10.3
+    container_name: DB_host
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: DB_interface
+    restart: always
+    ports:
+      - 3306:80
+    platform: linux/amd64
+    environment:
+#PMA 參數需帶入DB的容器名稱
+      - PMA_HOST=DB_host
+#先後啟動順序
+    depends_on:
+      - db
+  web:
+    image: nginx
+    container_name: web_server
+    volumes:
+      - "/Applications/MAMP/htdocs/firstproject:/usr/share/nginx/html/firstproject"
+      - "./nginx_config/nginx.conf:/etc/nginx/conf.d/default.conf"
+    ports:
+      - 8080:80
+  redis:
+    image: redis
+    container_name: redis
+  php:
+    container_name: php
+    build: ./php
+#php 掛載位置需與web_server相同
+    volumes:
+        - "/Applications/MAMP/htdocs/firstproject:/usr/share/nginx/html/firstproject"
+    depends_on:
+        - web
