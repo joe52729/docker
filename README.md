@@ -8,3 +8,4 @@ for laravel8 環境 <br>
   預設80 port 作為開發用途 <br>
   root須設置到webserver容器內專案的public資料夾 <br>
   fpm設定為 php容器名稱:該容器對外port號 <br>
+5.未來將會把 網站指向web_source
