@@ -1,9 +1,8 @@
-version: '3.1'
+version: '3.7'
 services:
   db:
     image: mariadb:10.3
     container_name: DB_host
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 1234
   phpmyadmin:
@@ -23,10 +22,12 @@ services:
     image: nginx
     container_name: web_server
     volumes:
-      - "/Applications/MAMP/htdocs/firstproject:/usr/share/nginx/html/firstproject"
+      - "~/source/sideProject/ulife_laravel:/usr/share/nginx/html/ulife_laravel"
       - "./nginx_config/nginx.conf:/etc/nginx/conf.d/default.conf"
     ports:
       - 8080:80
+    depends_on:
+      - php
   redis:
     image: redis
     container_name: redis
@@ -35,6 +36,185 @@ services:
     build: ./php
 #php 掛載位置需與web_server相同
     volumes:
-        - "/Applications/MAMP/htdocs/firstproject:/usr/share/nginx/html/firstproject"
-    depends_on:
-        - web
+        - "~/source/sideProject/ulife_laravel:/usr/share/nginx/html/ulife_laravel"
+#======================================================================================
+#PHP workspace, copy form laradock 
+#======================================================================================
+  workspace:
+    build:
+      context: ./workspace
+      args:
+        - CHANGE_SOURCE=false
+        - SHELL_OH_MY_ZSH=false
+        - SHELL_OH_MY_ZSH_AUTOSUGESTIONS=false
+        - SHELL_OH_MY_ZSH_ALIASES=false
+        - BASE_IMAGE_TAG_PREFIX=latest
+        - LARADOCK_PHP_VERSION=7.3
+        - LARADOCK_PHALCON_VERSION=4.0.5
+        - INSTALL_PHPREDIS=true
+        - INSTALL_NODE=true
+        - INSTALL_YARN=true
+        - INSTALL_NPM_GULP=true
+        - INSTALL_NPM_VUE_CLI=true
+        - COMPOSER_GLOBAL_INSTALL=true
+        - INSTALL_AST=true
+        - INSTALL_MEMCACHED=true
+        - INSTALL_TCPING=true
+        - INSTALL_SUBVERSION=false
+        - INSTALL_BZ2=false
+        - INSTALL_GMP=false
+        - INSTALL_GNUPG=false
+        - INSTALL_XDEBUG=false
+        - INSTALL_PCOV=false
+        - INSTALL_PHPDBG=false
+        - INSTALL_BLACKFIRE=false
+        - INSTALL_SSH2=false
+        - INSTALL_SOAP=false
+        - INSTALL_XSL=false
+        - INSTALL_LDAP=false
+        - INSTALL_SMB=false
+        - INSTALL_IMAP=false
+        - INSTALL_MONGO=false
+        - INSTALL_AMQP=false
+        - INSTALL_CASSANDRA=false
+        - INSTALL_GEARMAN=false        
+        - INSTALL_MSSQL=false
+        - NVM_NODEJS_ORG_MIRROR=        
+        - NPM_REGISTRY=
+        - NPM_FETCH_RETRIES=2
+        - NPM_FETCH_RETRY_FACTOR=10
+        - NPM_FETCH_RETRY_MINTIMEOUT=10000
+        - NPM_FETCH_RETRY_MAXTIMEOUT=60000
+        - INSTALL_PNPM=false                
+        - INSTALL_NPM_BOWER=false        
+        - INSTALL_NPM_ANGULAR_CLI=false
+        - INSTALL_DRUSH=false
+        - INSTALL_WP_CLI=false
+        - INSTALL_DRUPAL_CONSOLE=false
+        - INSTALL_AEROSPIKE=false
+        - INSTALL_OCI8=false
+        - INSTALL_V8JS=false        
+        - COMPOSER_VERSION=1
+        - COMPOSER_AUTH=false
+        - COMPOSER_REPO_PACKAGIST=
+        - INSTALL_WORKSPACE_SSH=false
+        - INSTALL_LARAVEL_ENVOY=false
+        - INSTALL_LARAVEL_INSTALLER=false
+        - INSTALL_XLSWRITER=false
+        - INSTALL_DEPLOYER=false
+        - INSTALL_PRESTISSIMO=false
+        - INSTALL_LINUXBREW=false
+        - INSTALL_MC=false
+        - INSTALL_SYMFONY=false
+        - INSTALL_PYTHON=false
+        - INSTALL_PYTHON3=false
+        - INSTALL_IMAGE_OPTIMIZERS=false
+        - INSTALL_IMAGEMAGICK=false
+        - INSTALL_TERRAFORM=false
+        - INSTALL_DUSK_DEPS=false
+        - INSTALL_PG_CLIENT=false
+        - INSTALL_PHALCON=false
+        - INSTALL_SWOOLE=false
+        - INSTALL_TAINT=false
+        - INSTALL_LIBPNG=false
+        - INSTALL_GRAPHVIZ=false
+        - INSTALL_IONCUBE=false
+        - INSTALL_MYSQL_CLIENT=false
+        - INSTALL_PING=false
+        - INSTALL_SSHPASS=false
+        - INSTALL_INOTIFY=false
+        - INSTALL_FSWATCH=false        
+        - INSTALL_YAML=false
+        - INSTALL_RDKAFKA=false
+        - INSTALL_MAILPARSE=false
+        - INSTALL_GIT_PROMPT=false
+        - INSTALL_XMLRPC=false
+        - PUID=1000
+        - PGID=1000
+        - CHROME_DRIVER_VERSION=2.42
+        - NODE_VERSION=14.16.1
+        - YARN_VERSION=latest
+        - DRUSH_VERSION=8.4.6
+        - AST_VERSION=1.0.10
+        - IMAGEMAGICK_VERSION=latest
+        - TZ=Asia/Taipei
+        - BLACKFIRE_CLIENT_ID="<client_id>"
+        - BLACKFIRE_CLIENT_TOKEN="<client_token>"
+        - INSTALL_POWERLINE=false
+        - INSTALL_SUPERVISOR=false
+        - INSTALL_FFMPEG=false
+        - INSTALL_AUDIOWAVEFORM=false
+        - INSTALL_WKHTMLTOPDF=false
+        - INSTALL_GNU_PARALLEL=false
+        - INSTALL_LNAV=false
+        - INSTALL_PROTOC=false
+        - INSTALL_PHPDECIMAL=false
+        - INSTALL_ZOOKEEPER=false
+        - INSTALL_SSDB=false
+        - INSTALL_TRADER=false
+        - PROTOC_VERSION=latest
+        - INSTALL_DOCKER_CLIENT=false        
+        - http_proxy
+        - https_proxy
+        - no_proxy
+    image: my_workspace:latest
+    restart: unless-stopped
+    container_name: workspace    
+    hostname: workspace    
+    volumes:
+      - ./web_source:/var/www:cached # 網站內容存放目錄
+      - docker-in-docker:/certs/client
+      - ./php-worker/supervisord.d:/etc/supervisord.d
+    extra_hosts:
+      - "dockerhost:192.168.99.100"
+    ports:
+      - "2222:22" # WORKSPACE_SSH_PORT
+      - "3000:3000" # WORKSPACE_BROWSERSYNC_HOST_PORT
+      - "3001:3001" # WORKSPACE_BROWSERSYNC_UI_HOST_PORT
+      #- "8080:8080" # WORKSPACE_VUE_CLI_SERVE_HOST_PORT
+      - "8001:8000" # WORKSPACE_VUE_CLI_UI_HOST_PORT
+      - "4200:4200" # WORKSPACE_ANGULAR_CLI_SERVE_HOST_PORT
+    tty: true
+    environment:
+      - PHP_IDE_CONFIG=serverName=laradock
+      - DOCKER_HOST=tcp://docker-in-docker:2376
+      - DOCKER_TLS_VERIFY=1
+      - DOCKER_TLS_CERTDIR=/certs
+      - DOCKER_CERT_PATH=/certs/client
+      - CHOKIDAR_USEPOLLING=true
+      - TZ=Asia/Taipei
+    networks:
+      extnetwork:
+        ipv4_address: 192.168.99.99 # 內部IP
+    links:
+      - docker-in-docker
+#======================================================================================
+#docker-in-docker (為了跨container用), copy form laradock 
+#======================================================================================
+  docker-in-docker:
+    image: docker:20.10-dind
+    container_name: docker
+    hostname: docker
+    environment:
+      DOCKER_TLS_SAN: DNS:docker-in-docker
+    privileged: true
+    volumes:
+      - ./web_source:/var/wwww # 網站內容存放目錄, 未來需再新增
+      - docker-in-docker:/certs/client
+    expose:
+    - 2375
+    networks:
+      extnetwork:
+        ipv4_address: 192.168.99.237 # 內部IP
+volumes:
+  docker-in-docker:
+    driver: local
+# ==========================================================================================================
+# Docker內部用網路設定
+# ==========================================================================================================
+networks:
+  extnetwork:
+    ipam:
+      config:
+        - subnet: 192.168.99.0/24
+          gateway: 192.168.99.1
