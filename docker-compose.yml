@@ -5,6 +5,10 @@ services:
     container_name: DB_host
     environment:
       MYSQL_ROOT_PASSWORD: 1234
+    volumes:
+      - ./mariadb/data/:/var/lib/mysql/ #資料庫存放目錄
+      - ./mariadb/log/:/var/log/mysql/ #Log紀錄檔目錄
+      - ./mariadb/conf.d/:/tmp/mariadb/conf.d/ #使用者設定檔目錄
   phpmyadmin:
     image: phpmyadmin
     container_name: DB_interface
