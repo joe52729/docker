@@ -9,12 +9,14 @@ services:
       - ./mariadb/data/:/var/lib/mysql/ #資料庫存放目錄
       - ./mariadb/log/:/var/log/mysql/ #Log紀錄檔目錄
       - ./mariadb/conf.d/:/tmp/mariadb/conf.d/ #使用者設定檔目錄
+    ports:
+      - 3306:3306 # Host主機Port 3306，對應到container的Port 3306  
   phpmyadmin:
     image: phpmyadmin
     container_name: DB_interface
     restart: unless-stopped
     ports:
-      - 3306:80
+      - 8081:80
     platform: linux/amd64
     environment:
 #PMA 參數需帶入DB的容器名稱
