@@ -6,6 +6,11 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 1234
+    volumes:
+      - ./db_data:/var/lib/mysql
+    networks:
+      - mynetwork
+
   phpmyadmin:
     image: phpmyadmin
     container_name: DB_interface
@@ -14,27 +19,41 @@ services:
       - 3306:80
     platform: linux/amd64
     environment:
-#PMA 參數需帶入DB的容器名稱
       - PMA_HOST=DB_host
-#先後啟動順序
     depends_on:
       - db
+    networks:
+      - mynetwork
+
   web:
     image: nginx
     container_name: web_server
     volumes:
-      - "/Applications/MAMP/htdocs/firstproject:/usr/share/nginx/html/firstproject"
+      - "~/source/brendon/ci:/usr/share/nginx/html/ci"
       - "./nginx_config/nginx.conf:/etc/nginx/conf.d/default.conf"
     ports:
       - 8080:80
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+
   redis:
     image: redis
     container_name: redis
+    networks:
+      - mynetwork
+
   php:
     container_name: php
     build: ./php
-#php 掛載位置需與web_server相同
     volumes:
-        - "/Applications/MAMP/htdocs/firstproject:/usr/share/nginx/html/firstproject"
+      - "~/source/brendon/ci:/usr/share/nginx/html/ci"
     depends_on:
-        - web
+      - web
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
