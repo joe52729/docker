@@ -1,0 +1,13 @@
+version: '3'
+services:
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8080:80
+    environment:
+      - PMA_HOSTS=ci-dev.c7g5e2as0cli.ap-northeast-1.rds.amazonaws.com:3306
+      - PMA_HOST=ci-dev.c7g5e2as0cli.ap-northeast-1.rds.amazonaws.com
+      - PMA_PORT=3306
+      - PMA_USER=rocketsz
+      - PMA_PASSWORD=6YwHc7Xqw36G
+      - PMA_ARBITRARY=1
